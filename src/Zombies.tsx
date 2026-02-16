@@ -124,7 +124,7 @@ export const Zombies = ({ dangerLevel, onHit, onAttack }: {
 
         if (state.clock.elapsedTime - lastSpawnTime.current > spawnRate && zombies.length < maxZombies) {
             const angle = Math.random() * Math.PI * 2;
-            const radius = 25 + Math.random() * 5;
+            const radius = 40 + Math.random() * 10;
             const x = Math.cos(angle) * radius;
             const z = Math.sin(angle) * radius;
 

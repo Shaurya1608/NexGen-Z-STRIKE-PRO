@@ -7,7 +7,7 @@ export const Engine = ({ children }: { children: React.ReactNode }) => {
     return (
         <>
             <color attach="background" args={["#020205"]} />
-            <fog attach="fog" args={["#020205", 5, 30]} />
+            <fog attach="fog" args={["#020205", 50, 200]} />
 
             {/* Optimized Lighting - Reduced Shadow Map Size */}
             <ambientLight intensity={0.1} />
