@@ -47,7 +47,7 @@ function App() {
 
   useEffect(() => {
     if (window.GametSDK) {
-      window.GametSDK.init("nexgen-z-strike-pro", {
+      window.GametSDK.init("nex-gen-z-strike", {
         onInit: () => console.log("GamerThred SDK Pro Ready"),
       });
     }
