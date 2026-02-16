@@ -106,7 +106,6 @@ function App() {
 
   const handleMatchEnd = () => {
     if (window.GametSDK) window.GametSDK.matchEnd({ score, kills, survival_time: elapsedTime });
-    window.location.reload();
   };
 
   const handleMoveJoystick = (e: React.TouchEvent) => {
