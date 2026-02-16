@@ -35,6 +35,13 @@ function App() {
   const [lastHit, setLastHit] = useState(false);
   const [isDamaged, setIsDamaged] = useState(false);
 
+  // 💎 AAA POLISH: ENGAGEMENT & FEEL
+  const [combo, setCombo] = useState(0);
+  const [multiplier, setMultiplier] = useState(1);
+  const [shake, setShake] = useState(0);
+  const [popups, setPopups] = useState<{ id: number; score: number; pos: { x: number; y: number } }[]>([]);
+  const comboTimer = useRef<any>(null);
+
   const [dangerLevel, setDangerLevel] = useState(1);
   const [elapsedTime, setElapsedTime] = useState(0);
 
@@ -73,12 +80,39 @@ function App() {
   };
 
   const handleZombieHit = useCallback((_pos: THREE.Vector3, isKill = false) => {
+    // 💥 Combo Logic
+    if (isKill) {
+      setCombo(c => {
+        const newCombo = c + 1;
+        setMultiplier(1 + Math.floor(newCombo / 5) * 0.5);
+
+        if (comboTimer.current) clearTimeout(comboTimer.current);
+        comboTimer.current = setTimeout(() => {
+          setCombo(0);
+          setMultiplier(1);
+        }, 3000); // 3s combo window
+
+        return newCombo;
+      });
+    }
+
     setScore((s) => {
-      const added = isKill ? 100 : 25;
+      const base = isKill ? 100 : 25;
+      const added = Math.floor(base * multiplier);
       const newScore = s + added;
+
+      // Floating Popup
+      const id = Date.now();
+      setPopups(prev => [...prev, { id, score: added, pos: { x: window.innerWidth / 2, y: window.innerHeight / 2 } }]);
+      setTimeout(() => setPopups(prev => prev.filter(p => p.id !== id)), 800);
+
       if (window.GametSDK) window.GametSDK.reportScoreUpdate(newScore);
       return newScore;
     });
+
+    // Suble hit shake
+    setShake(isKill ? 0.3 : 0.1);
+    setTimeout(() => setShake(0), 100);
 
     if (isKill) {
       setKills(k => k + 1);
@@ -101,7 +135,11 @@ function App() {
       return newHealth;
     });
     setIsDamaged(true);
-    setTimeout(() => setIsDamaged(false), 200);
+    setShake(0.8); // Punchy damage shake
+    setTimeout(() => {
+      setIsDamaged(false);
+      setShake(0);
+    }, 300);
   }, [gameState, dangerLevel]);
 
   const handleMatchEnd = () => {
@@ -140,10 +178,21 @@ function App() {
   };
 
   return (
-    <div className={`game-container ${isMobile ? 'mobile' : ''}`}>
+    <div className={`game-container ${isMobile ? 'mobile' : ''} ${shake > 0 ? 'shake-active' : ''}`} style={shake > 0 ? { transform: `translate(${(Math.random() - 0.5) * shake * 20}px, ${(Math.random() - 0.5) * shake * 20}px)` } : {}}>
       <AnimatePresence>
+        {popups.map(p => (
+          <motion.div
+            key={p.id}
+            initial={{ opacity: 1, y: 0, scale: 0.5 }}
+            animate={{ opacity: 0, y: -100, scale: 1.5 }}
+            className="floating-score"
+            style={{ left: p.pos.x, top: p.pos.y }}
+          >
+            +{p.score}
+          </motion.div>
+        ))}
         {gameState === "menu" && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="overlay main-menu">
+          <motion.div key="menu" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="overlay main-menu">
             <div className="branding">
               <motion.h1 initial={{ y: -20 }} animate={{ y: 0 }}>Z-STRIKE PRO</motion.h1>
               <div className="version-tag">MIDNIGHT SURVIVAL | V2.2</div>
@@ -156,7 +205,7 @@ function App() {
         )}
 
         {gameState === "gameover" && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="overlay game-over">
+          <motion.div key="gameover" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="overlay game-over">
             <h2>MISSION FAILED</h2>
             <div className="final-stats">
               <div className="stat-card"><span>SCORE</span><strong>{score}</strong></div>
@@ -170,87 +219,98 @@ function App() {
 
       <div className={`damage-fx ${isDamaged ? "active" : ""}`} />
 
-      {gameState === "playing" && (
-        <div className="hud-layer">
-          <div className={`crosshair ${lastHit ? "hit" : ""}`} />
+      {
+        gameState === "playing" && (
+          <div className="hud-layer">
+            <div className={`crosshair ${lastHit ? "hit" : ""}`} />
 
-          <div className="hud-top">
-            <div className="kill-feed">
-              <AnimatePresence>
-                {killFeed.map(k => (
-                  <motion.div key={k.id} initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: 20, opacity: 0 }} className="feed-item">
-                    {k.msg}
-                  </motion.div>
-                ))}
-              </AnimatePresence>
+            <div className="hud-top">
+              <div className="kill-feed">
+                <AnimatePresence>
+                  {killFeed.map(k => (
+                    <motion.div key={k.id} initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: 20, opacity: 0 }} className="feed-item">
+                      {k.msg}
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </div>
+              <div className="danger-widget">
+                <div className="label">DANGER LEVEL</div>
+                <div className="value">{dangerLevel}</div>
+                <div className="danger-bar-bg"><div className="danger-bar-fill" style={{ width: `${(elapsedTime % 60) / 60 * 100}%` }} /></div>
+              </div>
+              <div className="score-widget">
+                <div className="label">SCORE</div>
+                <div className="value">{score.toLocaleString()}</div>
+                {multiplier > 1 && <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="multiplier-badge">{multiplier}X</motion.div>}
+              </div>
+              {combo > 1 && (
+                <motion.div initial={{ x: 50, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="combo-meter">
+                  <div className="combo-count">{combo}</div>
+                  <div className="combo-label">COMBO</div>
+                </motion.div>
+              )}
             </div>
-            <div className="danger-widget">
-              <div className="label">DANGER LEVEL</div>
-              <div className="value">{dangerLevel}</div>
-              <div className="danger-bar-bg"><div className="danger-bar-fill" style={{ width: `${(elapsedTime % 60) / 60 * 100}%` }} /></div>
+
+            <div className="hud-bottom">
+              <div className="status-grid">
+                <div className="status-group">
+                  <div className="label">VITALS</div>
+                  <div className="bar-container hp">
+                    <div className="bar-fill" style={{ width: `${health}%` }} />
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="score-widget">
-              <div className="label">SCORE</div>
-              <div className="value">{score.toLocaleString()}</div>
-            </div>
+
+            {isMobile && (
+              <div className="mobile-ui">
+                <div className="move-zone" onTouchMove={handleMoveJoystick} onTouchEnd={() => { joystickValue.current = { x: 0, y: 0 }; setJoystickDisplay({ x: 0, y: 0 }); }}>
+                  <div className="joystick-zone">
+                    <div className="joystick-knob" style={{ transform: `translate(${joystickDisplay.x}px, ${joystickDisplay.y}px)` }} />
+                  </div>
+                </div>
+
+                <div className="look-zone" onTouchMove={handleLookZone} onTouchEnd={resetLook}>
+                  <div className="shoot-btn" onTouchStart={(e) => { e.stopPropagation(); window.dispatchEvent(new CustomEvent('shoot')); }}>FIRE</div>
+                  <div className="action-btns">
+                    <div className="mini-btn" onTouchStart={(e) => { e.stopPropagation(); window.dispatchEvent(new CustomEvent('reload')); }}>R</div>
+                    <div className="mini-btn" onTouchStart={(e) => { e.stopPropagation(); window.dispatchEvent(new CustomEvent('jump')); }}>▲</div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
+        )
+      }
 
-          <div className="hud-bottom">
-            <div className="status-grid">
-              <div className="status-group">
-                <div className="label">VITALS</div>
-                <div className="bar-container hp">
-                  <div className="bar-fill" style={{ width: `${health}%` }} />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {isMobile && (
-            <div className="mobile-ui">
-              <div className="move-zone" onTouchMove={handleMoveJoystick} onTouchEnd={() => { joystickValue.current = { x: 0, y: 0 }; setJoystickDisplay({ x: 0, y: 0 }); }}>
-                <div className="joystick-zone">
-                  <div className="joystick-knob" style={{ transform: `translate(${joystickDisplay.x}px, ${joystickDisplay.y}px)` }} />
-                </div>
-              </div>
-
-              <div className="look-zone" onTouchMove={handleLookZone} onTouchEnd={resetLook}>
-                <div className="shoot-btn" onTouchStart={(e) => { e.stopPropagation(); window.dispatchEvent(new CustomEvent('shoot')); }}>FIRE</div>
-                <div className="action-btns">
-                  <div className="mini-btn" onTouchStart={(e) => { e.stopPropagation(); window.dispatchEvent(new CustomEvent('reload')); }}>R</div>
-                  <div className="mini-btn" onTouchStart={(e) => { e.stopPropagation(); window.dispatchEvent(new CustomEvent('jump')); }}>▲</div>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
-      {gameState === "playing" && (
-        <KeyboardControls map={keyboardMap}>
-          {/* PERFORMANCE OPTIMIZED CANVAS: Fixed DPR for Mobile */}
-          <Canvas
-            shadows
-            camera={{ fov: 45 }}
-            dpr={isMobile ? [1, 1] : [1, 2]}
-            gl={{
-              powerPreference: "high-performance",
-              antialias: !isMobile
-            }}
-          >
-            <Physics gravity={[0, -9.81, 0]}>
-              <Engine>
-                <Map />
-                <Player mobileJoystick={joystickValue.current} mobileLookDelta={lookDelta} />
-                <Weapon isMobile={isMobile} />
-                <Zombies dangerLevel={dangerLevel} onHit={handleZombieHit} onAttack={handlePlayerDamage} />
-              </Engine>
-            </Physics>
-            {!isMobile && <PointerLockControls makeDefault />}
-          </Canvas>
-        </KeyboardControls>
-      )}
-    </div>
+      {
+        gameState === "playing" && (
+          <KeyboardControls map={keyboardMap}>
+            {/* PERFORMANCE OPTIMIZED CANVAS: Fixed DPR for Mobile */}
+            <Canvas
+              shadows
+              camera={{ fov: 45 }}
+              dpr={isMobile ? [1, 1] : [1, 2]}
+              gl={{
+                powerPreference: "high-performance",
+                antialias: !isMobile
+              }}
+            >
+              <Physics gravity={[0, -9.81, 0]}>
+                <Engine>
+                  <Map />
+                  <Player mobileJoystick={joystickValue.current} mobileLookDelta={lookDelta} />
+                  <Weapon isMobile={isMobile} />
+                  <Zombies dangerLevel={dangerLevel} onHit={handleZombieHit} onAttack={handlePlayerDamage} />
+                </Engine>
+              </Physics>
+              {!isMobile && <PointerLockControls makeDefault />}
+            </Canvas>
+          </KeyboardControls>
+        )
+      }
+    </div >
   );
 }
 

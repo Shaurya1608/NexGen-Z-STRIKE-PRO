@@ -139,6 +139,60 @@ html,
   font-weight: 900;
   line-height: 1;
   text-shadow: 0 0 20px var(--primary);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.multiplier-badge {
+  background: var(--primary);
+  color: #000;
+  font-size: 0.8rem;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 900;
+  box-shadow: 0 0 15px var(--primary);
+}
+
+.combo-meter {
+  position: absolute;
+  top: 100px;
+  right: 40px;
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.combo-count {
+  font-size: 4rem;
+  font-weight: 900;
+  color: #fff;
+  line-height: 0.8;
+  font-style: italic;
+  text-shadow: 0 0 30px rgba(255, 255, 255, 0.4);
+}
+
+.combo-label {
+  font-size: 0.8rem;
+  font-weight: 900;
+  color: var(--primary);
+  letter-spacing: 4px;
+}
+
+.floating-score {
+  position: absolute;
+  pointer-events: none;
+  font-weight: 900;
+  color: var(--primary);
+  font-size: 1.5rem;
+  text-shadow: 0 0 10px rgba(0, 0, 0, 1);
+  z-index: 1000;
+  font-family: 'Space Mono', monospace;
+}
+
+.game-container.shake-active {
+  transition: none !important;
 }
 
 .danger-widget {

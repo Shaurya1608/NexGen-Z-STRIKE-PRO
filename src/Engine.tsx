@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { Environment, Stars, PerspectiveCamera } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
+import { Embers } from "./Embers";
 
 export const Engine = ({ children }: { children: React.ReactNode }) => {
     return (
@@ -9,15 +10,17 @@ export const Engine = ({ children }: { children: React.ReactNode }) => {
             <fog attach="fog" args={["#020205", 5, 30]} />
 
             {/* Optimized Lighting - Reduced Shadow Map Size */}
-            <ambientLight intensity={0.2} />
+            <ambientLight intensity={0.1} />
             <directionalLight
                 position={[10, 20, 10]}
-                intensity={0.8}
+                intensity={1.2}
                 castShadow
                 shadow-mapSize={[512, 512]}
-                color="#0066ff"
+                color="#00ffcc"
             />
+            <pointLight position={[0, 5, 0]} intensity={0.5} color="#ff6600" />
             <Environment preset="night" />
+            <Embers count={200} />
 
             {/* Optimized Stars - Reduced Count */}
             <Stars
