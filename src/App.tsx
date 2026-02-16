@@ -159,7 +159,7 @@ function App() {
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="overlay game-over">
             <h2>MISSION FAILED</h2>
             <div className="final-stats">
-              <div className="stat-card"><span>REVENUE</span><strong>${score}</strong></div>
+              <div className="stat-card"><span>SCORE</span><strong>{score}</strong></div>
               <div className="stat-card"><span>SURVIVED</span><strong>{Math.floor(elapsedTime / 60)}:{(elapsedTime % 60).toString().padStart(2, '0')}</strong></div>
               <div className="stat-card"><span>DANGER</span><strong>LVL {dangerLevel}</strong></div>
             </div>
@@ -190,8 +190,8 @@ function App() {
               <div className="danger-bar-bg"><div className="danger-bar-fill" style={{ width: `${(elapsedTime % 60) / 60 * 100}%` }} /></div>
             </div>
             <div className="score-widget">
-              <div className="label">REVENUE</div>
-              <div className="value">${score.toLocaleString()}</div>
+              <div className="label">SCORE</div>
+              <div className="value">{score.toLocaleString()}</div>
             </div>
           </div>
 

@@ -37,6 +37,6 @@ To make your game playable by anyone in the world:
 ## 4. GamerThred Platform Integration
 Since we integrated the **GamerThred SDK**, ensure you:
 - Upload the `dist/` folder to the GamerThred dashboard.
-- Verify that your **Game ID** (`nexgen-z-strike-pro`) matches your dashboard settings.
+- Verify that your **Game ID** (`nex-gen-z-strike`) matches your dashboard settings.
 
 **The game is now technically optimized, bug-free, and combat-ready. Mission accomplished!** 🧟‍♂️🔥🎖️
