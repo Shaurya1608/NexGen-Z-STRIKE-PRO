@@ -26,7 +26,7 @@ export const Engine = ({ children }: { children: React.ReactNode }) => {
             <Stars
                 radius={100}
                 depth={50}
-                count={1000}
+                count={500}
                 factor={4}
                 saturation={0}
                 fade

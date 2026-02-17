@@ -33,20 +33,20 @@ export const Map = () => {
     // Generate 200 trees in clusters
     const trees = useMemo(() => {
         const t = [];
-        // Forest cluster 1
-        for (let i = 0; i < 80; i++) {
+        // Forest cluster 1 (reduced)
+        for (let i = 0; i < 40; i++) {
             const x = -150 + (Math.random() - 0.5) * 80;
             const z = -150 + (Math.random() - 0.5) * 80;
             t.push([x, 0, z] as [number, number, number]);
         }
-        // Forest cluster 2
-        for (let i = 0; i < 80; i++) {
+        // Forest cluster 2 (reduced)
+        for (let i = 0; i < 40; i++) {
             const x = 150 + (Math.random() - 0.5) * 80;
             const z = 150 + (Math.random() - 0.5) * 80;
             t.push([x, 0, z] as [number, number, number]);
         }
-        // Scattered trees
-        for (let i = 0; i < 40; i++) {
+        // Scattered trees (reduced)
+        for (let i = 0; i < 20; i++) {
             const x = (Math.random() - 0.5) * 400;
             const z = (Math.random() - 0.5) * 400;
             if (Math.abs(x) > 20 || Math.abs(z) > 20) {
@@ -59,7 +59,7 @@ export const Map = () => {
     // Sand patches for desert areas
     const sandPatches = useMemo(() => {
         const patches = [];
-        for (let i = 0; i < 15; i++) {
+        for (let i = 0; i < 8; i++) {
             const x = (Math.random() - 0.5) * 400;
             const z = (Math.random() - 0.5) * 400;
             const size = 10 + Math.random() * 20;
@@ -85,7 +85,7 @@ export const Map = () => {
             />
 
             {/* Natural Elements */}
-            <Rocks count={50} spread={400} />
+            <Rocks count={30} spread={400} />
             <WaterBodies />
 
             {/* Sand Patches */}
@@ -100,7 +100,7 @@ export const Map = () => {
             <Houses />
 
             {/* Wildlife */}
-            <Animals count={20} />
+            <Animals count={10} />
 
             {/* Boundary Walls (far perimeter) */}
             <RigidBody type="fixed" colliders="cuboid" position={[0, 5, -250]}>

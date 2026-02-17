@@ -78,7 +78,20 @@ const Zombie = ({ position, health: initialHealth, speedFactor, onHit, onAttack 
     if (dead) return null;
 
     return (
-        <RigidBody ref={rigidBody} type="dynamic" colliders="cuboid" position={position} onCollisionEnter={handleCollision} enabledRotations={[false, true, false]} canSleep={false}>
+        <RigidBody
+            ref={rigidBody}
+            type="dynamic"
+            colliders="cuboid"
+            position={position}
+            onCollisionEnter={handleCollision}
+            enabledRotations={[false, true, false]}
+            canSleep={false}
+            linearDamping={0.5}
+            angularDamping={0.5}
+            ccd={true}
+            mass={1}
+            gravityScale={1}
+        >
             <group ref={visualGroup}>
                 {/* HEAD - Sphere with zombie features */}
                 <mesh position={[0, 1.7, 0]} castShadow>
@@ -206,7 +219,7 @@ export const Zombies = ({ dangerLevel, onHit, onAttack }: {
 
         if (state.clock.elapsedTime - lastSpawnTime.current > spawnRate && zombies.length < maxZombies) {
             const angle = Math.random() * Math.PI * 2;
-            const radius = 40 + Math.random() * 10;
+            const radius = 20 + Math.random() * 10; // Closer spawn for visibility
             const x = Math.cos(angle) * radius;
             const z = Math.sin(angle) * radius;
 

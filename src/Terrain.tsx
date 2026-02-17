@@ -5,7 +5,7 @@ import * as THREE from "three";
 export const Terrain = ({ size = 500 }: { size?: number }) => {
     // Generate height map using simple noise
     const geometry = useMemo(() => {
-        const segments = 100;
+        const segments = 50; // Reduced from 100 for better performance
         const geo = new THREE.PlaneGeometry(size, size, segments, segments);
         const positions = geo.attributes.position.array as Float32Array;
 
