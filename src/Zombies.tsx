@@ -80,29 +80,111 @@ const Zombie = ({ position, health: initialHealth, speedFactor, onHit, onAttack 
     return (
         <RigidBody ref={rigidBody} type="dynamic" colliders="cuboid" position={position} onCollisionEnter={handleCollision} enabledRotations={[false, true, false]} canSleep={false}>
             <group ref={visualGroup}>
-                <mesh position={[0, 1.6, 0]} castShadow>
-                    <boxGeometry args={[0.35, 0.35, 0.35]} />
-                    <meshStandardMaterial color={isHit ? "#ff0000" : "#2d5a27"} />
+                {/* HEAD - Sphere with zombie features */}
+                <mesh position={[0, 1.7, 0]} castShadow>
+                    <sphereGeometry args={[0.2, 16, 16]} />
+                    <meshStandardMaterial
+                        color={isHit ? "#ff0000" : "#6b8e6b"}
+                        roughness={0.8}
+                    />
                 </mesh>
-                <mesh position={[0, 1, 0]} castShadow>
-                    <boxGeometry args={[0.5, 0.9, 0.25]} />
-                    <meshStandardMaterial color={isHit ? "#ff0000" : "#1e3d1a"} />
+
+                {/* Eyes - Glowing red */}
+                <mesh position={[0.08, 1.72, 0.18]}>
+                    <sphereGeometry args={[0.03, 8, 8]} />
+                    <meshStandardMaterial color="#ff0000" emissive="#ff0000" emissiveIntensity={2} />
                 </mesh>
-                <mesh position={[0.3, 1.2, 0.3]} rotation={[Math.PI / 2.2, 0, 0]} castShadow>
-                    <boxGeometry args={[0.12, 0.5, 0.12]} />
-                    <meshStandardMaterial color="#2d5a27" />
+                <mesh position={[-0.08, 1.72, 0.18]}>
+                    <sphereGeometry args={[0.03, 8, 8]} />
+                    <meshStandardMaterial color="#ff0000" emissive="#ff0000" emissiveIntensity={2} />
                 </mesh>
-                <mesh position={[-0.3, 1.2, 0.3]} rotation={[Math.PI / 2.2, 0, 0]} castShadow>
-                    <boxGeometry args={[0.12, 0.5, 0.12]} />
-                    <meshStandardMaterial color="#2d5a27" />
+
+                {/* TORSO - Capsule shape */}
+                <mesh position={[0, 1.1, 0]} castShadow>
+                    <capsuleGeometry args={[0.2, 0.6, 8, 16]} />
+                    <meshStandardMaterial
+                        color={isHit ? "#ff0000" : "#4a5a4a"}
+                        roughness={0.9}
+                    />
                 </mesh>
-                <mesh position={[0.15, 0.3, 0]} castShadow>
-                    <boxGeometry args={[0.12, 0.6, 0.12]} />
-                    <meshStandardMaterial color="#111" />
+
+                {/* Tattered shirt detail */}
+                <mesh position={[0, 1.1, 0.21]} castShadow>
+                    <boxGeometry args={[0.42, 0.65, 0.02]} />
+                    <meshStandardMaterial
+                        color="#2a3a2a"
+                        roughness={1}
+                    />
                 </mesh>
-                <mesh position={[-0.15, 0.3, 0]} castShadow>
-                    <boxGeometry args={[0.12, 0.6, 0.12]} />
-                    <meshStandardMaterial color="#111" />
+
+                {/* ARMS - Cylinders with joints */}
+                {/* Right Upper Arm */}
+                <group position={[0.25, 1.3, 0]}>
+                    <mesh position={[0.15, -0.15, 0]} rotation={[0, 0, Math.PI / 6]} castShadow>
+                        <cylinderGeometry args={[0.06, 0.05, 0.35, 8]} />
+                        <meshStandardMaterial color="#6b8e6b" roughness={0.8} />
+                    </mesh>
+                    {/* Right Forearm */}
+                    <mesh position={[0.25, -0.45, 0.1]} rotation={[Math.PI / 4, 0, Math.PI / 6]} castShadow>
+                        <cylinderGeometry args={[0.05, 0.04, 0.35, 8]} />
+                        <meshStandardMaterial color="#5a7a5a" roughness={0.8} />
+                    </mesh>
+                    {/* Right Hand */}
+                    <mesh position={[0.3, -0.7, 0.25]}>
+                        <sphereGeometry args={[0.06, 8, 8]} />
+                        <meshStandardMaterial color="#5a7a5a" roughness={0.9} />
+                    </mesh>
+                </group>
+
+                {/* Left Upper Arm */}
+                <group position={[-0.25, 1.3, 0]}>
+                    <mesh position={[-0.15, -0.15, 0]} rotation={[0, 0, -Math.PI / 6]} castShadow>
+                        <cylinderGeometry args={[0.06, 0.05, 0.35, 8]} />
+                        <meshStandardMaterial color="#6b8e6b" roughness={0.8} />
+                    </mesh>
+                    {/* Left Forearm */}
+                    <mesh position={[-0.25, -0.45, 0.1]} rotation={[Math.PI / 4, 0, -Math.PI / 6]} castShadow>
+                        <cylinderGeometry args={[0.05, 0.04, 0.35, 8]} />
+                        <meshStandardMaterial color="#5a7a5a" roughness={0.8} />
+                    </mesh>
+                    {/* Left Hand */}
+                    <mesh position={[-0.3, -0.7, 0.25]}>
+                        <sphereGeometry args={[0.06, 8, 8]} />
+                        <meshStandardMaterial color="#5a7a5a" roughness={0.9} />
+                    </mesh>
+                </group>
+
+                {/* LEGS - Cylinders with joints */}
+                {/* Right Thigh */}
+                <mesh position={[0.1, 0.5, 0]} castShadow>
+                    <cylinderGeometry args={[0.08, 0.07, 0.5, 8]} />
+                    <meshStandardMaterial color="#3a4a3a" roughness={0.9} />
+                </mesh>
+                {/* Right Shin */}
+                <mesh position={[0.1, 0.15, 0]} castShadow>
+                    <cylinderGeometry args={[0.06, 0.05, 0.3, 8]} />
+                    <meshStandardMaterial color="#6b8e6b" roughness={0.8} />
+                </mesh>
+                {/* Right Foot */}
+                <mesh position={[0.1, 0, 0.08]} castShadow>
+                    <boxGeometry args={[0.1, 0.05, 0.18]} />
+                    <meshStandardMaterial color="#2a2a2a" roughness={1} />
+                </mesh>
+
+                {/* Left Thigh */}
+                <mesh position={[-0.1, 0.5, 0]} castShadow>
+                    <cylinderGeometry args={[0.08, 0.07, 0.5, 8]} />
+                    <meshStandardMaterial color="#3a4a3a" roughness={0.9} />
+                </mesh>
+                {/* Left Shin */}
+                <mesh position={[-0.1, 0.15, 0]} castShadow>
+                    <cylinderGeometry args={[0.06, 0.05, 0.3, 8]} />
+                    <meshStandardMaterial color="#6b8e6b" roughness={0.8} />
+                </mesh>
+                {/* Left Foot */}
+                <mesh position={[-0.1, 0, 0.08]} castShadow>
+                    <boxGeometry args={[0.1, 0.05, 0.18]} />
+                    <meshStandardMaterial color="#2a2a2a" roughness={1} />
                 </mesh>
             </group>
             <Text position={[0, 2.2, 0]} fontSize={0.15} color="white">{health} HP</Text>
