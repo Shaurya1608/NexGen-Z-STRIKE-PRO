@@ -142,9 +142,18 @@ function App() {
     }, 300);
   }, [gameState, dangerLevel]);
 
-  const handleMatchEnd = () => {
-    if (window.GametSDK) window.GametSDK.matchEnd({ score, kills, survival_time: elapsedTime });
-  };
+  const handleMatchEnd = useCallback(() => {
+    if (window.GametSDK) {
+      console.log("Reporting Match End:", { score, kills, survival_time: elapsedTime });
+      window.GametSDK.matchEnd({ score, kills, survival_time: elapsedTime });
+    }
+  }, [score, kills, elapsedTime]);
+
+  useEffect(() => {
+    if (gameState === "gameover") {
+      handleMatchEnd();
+    }
+  }, [gameState, handleMatchEnd]);
 
   const handleMoveJoystick = (e: React.TouchEvent) => {
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
